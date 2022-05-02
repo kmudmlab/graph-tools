@@ -1,0 +1,12 @@
+[package]
+name = "graph-tools"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Graph tools and algorithms written in Rust."
+repository = "https://github.com/kmudmlab/graph-tools"
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
