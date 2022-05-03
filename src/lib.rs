@@ -1,8 +1,28 @@
 pub mod union_find;
+pub mod triangle_counting;
 
 #[cfg(test)]
 mod test{
     use super::*;
+
+    #[test]
+    fn test_tri(){
+        let adj = vec![
+            vec![2,4,5],
+            vec![3],
+            vec![4,5],
+            vec![7,8],
+            vec![5],
+            vec![6],
+            vec![],
+            vec![],
+            vec![9],
+            vec![]
+            ];
+        
+        let cnt = triangle_counting::count_total(adj);
+        assert_eq!(cnt, 4);
+    }
 
     #[test]
     fn test_uf(){
