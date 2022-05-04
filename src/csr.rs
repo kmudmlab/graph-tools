@@ -4,7 +4,8 @@ pub struct CSR{
 }
 
 impl CSR{
-    pub fn from_edges(edges: &[(usize, usize)], n_nodes: usize, n_edges: usize) -> CSR{
+    pub fn from_edges(edges: &[(usize, usize)], n_nodes: usize) -> CSR{
+        let n_edges = edges.len();
         let mut csr = CSR{
             edges: vec![0; n_edges*2].into_boxed_slice(),
             nodes: vec![0; n_nodes + 1].into_boxed_slice(),
