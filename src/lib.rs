@@ -8,17 +8,32 @@ mod test{
 
     #[test]
     fn test_csr(){
-        let edges = vec![(1usize, 3usize), (3, 7), (3, 8),
-                         (8, 9), (0, 2), (0, 4),
+        let edges = vec![(1usize, 3usize), (3, 8), (3, 7),
+                         (8, 9), (0, 4), (0, 2),
                          (0, 5), (2, 4), (4, 5), (5, 6)];
         
         let n_nodes = 10;
         let n_edges = edges.len();
         let graph = csr::CSR::from_edges(&edges, n_nodes, n_edges);
-        for n in 0..n_nodes{
-            println!("{}({}): {:?}", n, graph.degree(n), graph.neighbors(n));
-        }
         
+        
+        //check degrees
+        let true_degrees = [3,1,2,3,3,3,1,1,2,1];
+
+        for n in 0..n_nodes{
+            assert_eq!(graph.degree(n), true_degrees[n]);
+        }
+
+        //check neighbors
+        let true_neighbors = [vec![2,4,5],vec![3],vec![0,4],vec![1,7,8],
+                            vec![0,2,5],vec![0,4,6],vec![5],vec![3],vec![3,9],vec![8]];
+        
+                            for n in 0..n_nodes{
+            let mut neighbors : Vec<usize> = vec![0; graph.degree(n)];
+            neighbors.clone_from_slice(graph.neighbors(n));
+            neighbors.sort();
+            assert_eq!(neighbors, true_neighbors[n]);
+        }
     }
 
     #[test]
