@@ -1,9 +1,25 @@
 pub mod union_find;
 pub mod triangle_counting;
+pub mod csr;
 
 #[cfg(test)]
 mod test{
     use super::*;
+
+    #[test]
+    fn test_csr(){
+        let edges = vec![(1usize, 3usize), (3, 7), (3, 8),
+                         (8, 9), (0, 2), (0, 4),
+                         (0, 5), (2, 4), (4, 5), (5, 6)];
+        
+        let n_nodes = 10;
+        let n_edges = edges.len();
+        let graph = csr::CSR::from_edges(&edges, n_nodes, n_edges);
+        for n in 0..n_nodes{
+            println!("{}({}): {:?}", n, graph.degree(n), graph.neighbors(n));
+        }
+        
+    }
 
     #[test]
     fn test_tri(){
