@@ -7,6 +7,26 @@ mod test{
     use super::*;
 
     #[test]
+    fn test_csr_edge_iterator(){
+        let edges = vec![(1usize,3usize), (1,4), (1,5), (4,5)];
+        let n_nodes = 6;
+        let graph = csr::CSR::from_edges(&edges, n_nodes);
+        
+        let mut true_edges = vec![];
+        for (u, v) in &edges {
+            true_edges.push( (*u, *v) );
+            true_edges.push( (*v, *u) );
+        }
+
+        let mut edges_from_iter : Vec<(usize, usize)> = graph.iter_edges().collect();
+
+        true_edges.sort();
+        edges_from_iter.sort();
+
+        assert_eq!(true_edges, edges_from_iter);
+    }
+
+    #[test]
     fn test_csr(){
         let edges = vec![(1usize, 3usize), (3, 8), (3, 7),
                          (8, 9), (0, 4), (0, 2),
@@ -26,7 +46,7 @@ mod test{
         let true_neighbors = [vec![2,4,5],vec![3],vec![0,4],vec![1,7,8],
                             vec![0,2,5],vec![0,4,6],vec![5],vec![3],vec![3,9],vec![8]];
         
-                            for n in 0..n_nodes{
+        for n in 0..n_nodes{
             let mut neighbors : Vec<usize> = vec![0; graph.degree(n)];
             neighbors.clone_from_slice(graph.neighbors(n));
             neighbors.sort();
