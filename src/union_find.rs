@@ -11,6 +11,15 @@ impl UnionFind{
         }
     }
 
+    pub fn reset<'a>(&mut self, nodes : impl Iterator<Item = &'a usize>) {
+        let mut n_nodes = 0;
+        for n in nodes{
+            self.parent[*n] = *n;
+            n_nodes += 1;
+        }
+        self.n_components = n_nodes;
+    }
+
     pub fn union(&mut self, mut u: usize, mut v: usize){
         let p = &mut self.parent;
         

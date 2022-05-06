@@ -2,6 +2,7 @@ pub mod union_find;
 pub mod triangle_counting;
 pub mod csr;
 pub mod heap;
+pub mod slashburn;
 
 #[cfg(test)]
 mod test{
