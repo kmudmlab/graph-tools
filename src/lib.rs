@@ -1,10 +1,26 @@
 pub mod union_find;
 pub mod triangle_counting;
 pub mod csr;
+pub mod heap;
 
 #[cfg(test)]
 mod test{
     use super::*;
+
+    #[test]
+    fn test_heap(){
+        let priorities = vec![6usize,3,7,1,9,5,4,8];
+        let mut indices : Vec<usize> = (0..priorities.len()).collect();
+
+        heap::heapify_indices(&mut indices, &priorities);
+        heap::sort_heap_indices(&mut indices, &priorities);
+        
+        let sorted_priorities : Vec<usize> = indices.iter().map(|x| priorities[*x]).collect();
+        let mut true_sorted_priorities = priorities.clone();
+        true_sorted_priorities.sort_by(|a, b| b.cmp(a));
+        
+        assert_eq!(sorted_priorities, true_sorted_priorities);
+    }
 
     #[test]
     fn test_csr_edge_iterator(){
