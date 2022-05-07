@@ -6,8 +6,9 @@ pub fn slashburn(edges: &[(usize, usize)], n_nodes: usize, k: usize) -> Vec<usiz
 
     let mut remain_edges : Vec<(usize, usize)> = edges.iter().copied().collect();
     let mut remain_nodes : HashSet<usize> = (0..n_nodes).collect();
-    let mut hubs = Vec::<usize>::new();
-    let mut spokes = Vec::<usize>::new();
+    let mut new_node_order = vec![0usize; n_nodes];
+    let mut cur_hubs = 0;
+    let mut cur_spokes = n_nodes;
 
     let mut degrees = vec![0; n_nodes].into_boxed_slice();
 
@@ -37,7 +38,9 @@ pub fn slashburn(edges: &[(usize, usize)], n_nodes: usize, k: usize) -> Vec<usiz
             }
         });
 
-        hubs.extend(hubs_remain.iter());
+        new_node_order[cur_hubs..cur_hubs + hubs_remain.len()].clone_from_slice(&hubs_remain);
+        cur_hubs += hubs_remain.len();
+        // hubs.extend(hubs_remain.iter());
 
         if remain_nodes.is_empty() {
             break;
@@ -45,16 +48,19 @@ pub fn slashburn(edges: &[(usize, usize)], n_nodes: usize, k: usize) -> Vec<usiz
         
         let spokes_remain = find_and_remove_spokes(&remain_edges, &mut remain_nodes, &mut uf);
         
-        spokes.extend(spokes_remain.iter().rev());
+        
+        new_node_order[cur_spokes-spokes_remain.len()..cur_spokes].clone_from_slice(&spokes_remain);
+        cur_spokes -= spokes_remain.len();
+        // spokes.extend(spokes_remain.iter().rev());
 
         if remain_nodes.is_empty() {
             break;
         }
     }
 
-    hubs.extend(spokes.into_iter().rev());
+    assert_eq!(cur_spokes, cur_hubs);
 
-    return hubs;
+    return new_node_order;
 
 }
 
