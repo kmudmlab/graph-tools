@@ -3,10 +3,40 @@ pub mod triangle_counting;
 pub mod csr;
 pub mod heap;
 pub mod slashburn;
+pub mod csbv;
+
 
 #[cfg(test)]
 mod test{
     use super::*;
+
+    #[test]
+    fn test_csbv(){
+
+        let edges = vec![(0,1), (0, 10), (0, 50), (0, 64), (0, 127), (3, 64), (3, 127)];
+        let n_nodes = 128;
+
+        let graph = csbv::CSBV::from_sorted_edges(&edges, n_nodes);
+
+        let true_csbv = csbv::CSBV{
+            bit_blocks: vec![1125899906843650, 9223372036854775809, 9223372036854775809],
+            block_ids: vec![0,1,1],
+            ptrs: vec![0, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+            3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+            3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+            3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+            3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+        };
+
+        assert_eq!(graph.bit_blocks, true_csbv.bit_blocks);
+        assert_eq!(graph.block_ids, true_csbv.block_ids);
+        assert_eq!(graph.ptrs, true_csbv.ptrs);
+
+        println!("{:?}", graph.bit_blocks);
+        println!("{:?}", graph.block_ids);
+        println!("{:?}", graph.ptrs);
+
+    }
 
     #[test]
     fn test_heap(){
