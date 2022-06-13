@@ -29,6 +29,9 @@ mod test{
         assert_eq!(graph.neighbor_iter(0).collect::<Vec<usize>>(), vec![1,10,50,64,127]);
         assert_eq!(graph.neighbor_iter(3).collect::<Vec<usize>>(), vec![64,127]);
 
+        assert_eq!(graph.block_iter(0).collect::<Vec<(usize, usize)>>(), vec![(0, 1125899906843650), (1, 9223372036854775809)]);
+        assert_eq!(graph.block_iter(3).collect::<Vec<(usize, usize)>>(), vec![(1, 9223372036854775809)]);
+
     }
 
     #[test]

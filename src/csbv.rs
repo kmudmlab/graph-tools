@@ -5,35 +5,20 @@ pub struct CSBV{
     pub ptrs: Vec<usize>
 }
 
-pub struct NeighborIterator<'a>{
-    csbv: &'a CSBV,
-    end: usize,
-    ptr: usize,
-    bits: usize
-}
-
-impl<'a> Iterator for NeighborIterator<'a> {
-    type Item = usize;
-    
-    fn next(&mut self) -> Option<Self::Item> {
-
-        const BLOCK_SIZE: usize = 64usize;
-        
-        if self.bits == 0 {
-            if self.ptr + 1 >= self.end { return None; }
-
-            self.ptr += 1;
-            self.bits = self.csbv.bit_blocks[self.ptr];
-        }
-
-        let offset: usize = self.bits.trailing_zeros().try_into().unwrap();
-        self.bits -= 1 << offset;
-        
-        return Some(self.csbv.block_ids[self.ptr] * BLOCK_SIZE + offset);
-    }
-}
-
 impl CSBV{
+
+    pub fn n_nodes(&self) -> usize{
+        return self.ptrs.len() - 1;
+    }
+
+
+    pub fn block_iter(&self, u: usize) -> NeighborBlockIterator{
+        return NeighborBlockIterator{
+            csbv: self,
+            end: self.ptrs[u+1],
+            ptr: self.ptrs[u]
+        }
+    }
 
     pub fn neighbor_iter(&self, u: usize) -> NeighborIterator{
         let ptr = self.ptrs[u];
@@ -109,5 +94,55 @@ impl CSBV{
         csbv.ptrs[0] = 0;
 
         return csbv;
+    }
+}
+
+
+pub struct NeighborIterator<'a>{
+    csbv: &'a CSBV,
+    end: usize,
+    ptr: usize,
+    bits: usize
+}
+
+impl<'a> Iterator for NeighborIterator<'a> {
+    type Item = usize;
+    
+    fn next(&mut self) -> Option<Self::Item> {
+
+        const BLOCK_SIZE: usize = 64usize;
+        
+        if self.bits == 0 {
+            if self.ptr + 1 >= self.end { return None; }
+
+            self.ptr += 1;
+            self.bits = self.csbv.bit_blocks[self.ptr];
+        }
+
+        let offset: usize = self.bits.trailing_zeros() as usize;
+        self.bits -= 1 << offset;
+        
+        return Some(self.csbv.block_ids[self.ptr] * BLOCK_SIZE + offset);
+    }
+}
+
+
+pub struct NeighborBlockIterator<'a>{
+    csbv: &'a CSBV,
+    end: usize,
+    ptr: usize
+}
+
+impl<'a> Iterator for NeighborBlockIterator<'a>{
+    type Item = (usize, usize);
+
+    fn next(&mut self) -> Option<Self::Item> {
+
+        if self.ptr < self.end {
+            self.ptr += 1;
+            return Some( (self.csbv.block_ids[self.ptr-1], self.csbv.bit_blocks[self.ptr-1]) );
+        }
+        
+        return None;
     }
 }
