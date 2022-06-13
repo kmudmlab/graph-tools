@@ -11,6 +11,23 @@ mod test{
     use super::*;
 
     #[test]
+    fn test_tri_csbv(){
+        let edges = vec![(1, 37), (1,40), (1,68), (37, 40), (37,68), (37,75), (40, 68), (40, 75)];
+        let n_nodes = 76;
+
+        let graph = csbv::CSBV::from_sorted_edges(&edges, n_nodes);
+        
+        println!("bit_blocks:");
+        for b in &graph.bit_blocks {
+            println!("{:b}", b);
+        }
+
+        let cnt = triangle_counting::count_from_csbv(&graph);
+        assert_eq!(cnt, 5);
+    }
+
+    
+    #[test]
     fn test_csbv(){
 
         let edges = vec![(0,1), (0, 10), (0, 50), (0, 64), (0, 127), (3, 64), (3, 127)];

@@ -1,5 +1,65 @@
 use std::cmp::Ordering;
 
+use crate::csbv::CSBV;
+
+pub fn count_from_csbv(graph: &CSBV) -> usize{
+
+    let mut cnt = 0usize;
+
+    for u in 0..graph.n_nodes() {
+        println!("u = {}", u);
+        for v in graph.neighbor_iter(u) {
+            cnt += count_intersect(u, v, graph);
+        }
+    }
+    return cnt;
+}
+
+pub fn count_intersect(u: usize, v: usize, graph: &CSBV) -> usize{
+    let mut cnt = 0usize;
+    
+    let mut uiter = graph.block_iter(u);
+    let mut viter = graph.block_iter(v);
+
+    let (mut un, mut un_bits) = match uiter.next() {
+        Some(x) => x,
+        None => return cnt
+    };
+
+    let (mut vn, mut vn_bits) = match viter.next() {
+        Some(x) => x,
+        None => return cnt
+    };
+
+    loop{
+        if un < vn {
+            (un, un_bits) = match uiter.next() {
+                Some(x) => x,
+                None => return cnt
+            }
+        }
+        else if un > vn {
+            (vn, vn_bits) = match viter.next() {
+                Some(x) => x,
+                None => return cnt
+            }
+        }
+        else {
+            cnt += (un_bits & vn_bits).count_ones() as usize;
+
+                (un, un_bits) = match uiter.next() {
+                    Some(x) => x,
+                    None => return cnt
+                };
+                (vn, vn_bits) = match viter.next() {
+                    Some(x) => x,
+                    None => return cnt
+                };
+        }
+    }
+
+}
+
 pub fn count_total(adj: Vec<Vec<usize>>) -> usize{
     let mut cnt = 0usize;
     for adj_u in adj.iter(){

@@ -22,11 +22,12 @@ impl CSBV{
 
     pub fn neighbor_iter(&self, u: usize) -> NeighborIterator{
         let ptr = self.ptrs[u];
+        
         return NeighborIterator{
             csbv: self,
             end: self.ptrs[u+1],
             ptr,
-            bits: self.bit_blocks[ptr]
+            bits: match self.bit_blocks.get(ptr) { Some(x) => *x, None => 0}
         };
     }
 
