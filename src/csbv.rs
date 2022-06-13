@@ -5,7 +5,46 @@ pub struct CSBV{
     pub ptrs: Vec<usize>
 }
 
+pub struct NeighborIterator<'a>{
+    csbv: &'a CSBV,
+    end: usize,
+    ptr: usize,
+    bits: usize
+}
+
+impl<'a> Iterator for NeighborIterator<'a> {
+    type Item = usize;
+    
+    fn next(&mut self) -> Option<Self::Item> {
+
+        const BLOCK_SIZE: usize = 64usize;
+        
+        if self.bits == 0 {
+            if self.ptr + 1 >= self.end { return None; }
+
+            self.ptr += 1;
+            self.bits = self.csbv.bit_blocks[self.ptr];
+        }
+
+        let offset: usize = self.bits.trailing_zeros().try_into().unwrap();
+        self.bits -= 1 << offset;
+        
+        return Some(self.csbv.block_ids[self.ptr] * BLOCK_SIZE + offset);
+    }
+}
+
 impl CSBV{
+
+    pub fn neighbor_iter(&self, u: usize) -> NeighborIterator{
+        let ptr = self.ptrs[u];
+        return NeighborIterator{
+            csbv: self,
+            end: self.ptrs[u+1],
+            ptr,
+            bits: self.bit_blocks[ptr]
+        };
+    }
+
     // edges are sorted, and has no duplicate. Nodes in each edge is ordered.
     pub fn from_sorted_edges(edges: &[(usize, usize)], n_nodes: usize) -> CSBV{
         let mut u_prev = usize::MAX;

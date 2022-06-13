@@ -18,23 +18,16 @@ mod test{
 
         let graph = csbv::CSBV::from_sorted_edges(&edges, n_nodes);
 
-        let true_csbv = csbv::CSBV{
-            bit_blocks: vec![1125899906843650, 9223372036854775809, 9223372036854775809],
-            block_ids: vec![0,1,1],
-            ptrs: vec![0, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+        assert_eq!(graph.bit_blocks, vec![1125899906843650, 9223372036854775809, 9223372036854775809]);
+        assert_eq!(graph.block_ids, vec![0,1,1]);
+        assert_eq!(graph.ptrs, vec![0, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
             3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
             3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
             3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-            3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
-        };
+            3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
 
-        assert_eq!(graph.bit_blocks, true_csbv.bit_blocks);
-        assert_eq!(graph.block_ids, true_csbv.block_ids);
-        assert_eq!(graph.ptrs, true_csbv.ptrs);
-
-        println!("{:?}", graph.bit_blocks);
-        println!("{:?}", graph.block_ids);
-        println!("{:?}", graph.ptrs);
+        assert_eq!(graph.neighbor_iter(0).collect::<Vec<usize>>(), vec![1,10,50,64,127]);
+        assert_eq!(graph.neighbor_iter(3).collect::<Vec<usize>>(), vec![64,127]);
 
     }
 
