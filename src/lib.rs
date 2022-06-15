@@ -1,5 +1,5 @@
 pub mod union_find;
-pub mod triangle_counting;
+pub mod tricnt;
 pub mod csr;
 pub mod heap;
 pub mod slashburn;
@@ -16,13 +16,19 @@ mod test{
         let n_nodes = 76;
 
         let graph = csbv::CSBV::from_sorted_edges(&edges, n_nodes);
-        
-        println!("bit_blocks:");
-        for b in &graph.bit_blocks {
-            println!("{:b}", b);
-        }
 
-        let cnt = triangle_counting::count_from_csbv(&graph);
+        let cnt = tricnt::csbv::count(&graph);
+        assert_eq!(cnt, 5);
+    }
+
+    #[test]
+    fn test_tri_csr(){
+        let edges = vec![(1, 37), (1,40), (1,68), (37, 40), (37,68), (37,75), (40, 68), (40, 75)];
+        let n_nodes = 76;
+
+        let graph = csr::CSR::from_sorted_edges(&edges, n_nodes);
+
+        let cnt = tricnt::csr::count(&graph);
         assert_eq!(cnt, 5);
     }
 
@@ -129,7 +135,7 @@ mod test{
             vec![]
             ];
         
-        let cnt = triangle_counting::count_total(adj);
+        let cnt = tricnt::count_total(adj);
         assert_eq!(cnt, 4);
     }
 

@@ -1,14 +1,36 @@
 pub struct CSR{
-    nodes: Box<[usize]>,
-    edges: Box<[usize]>
+    nodes: Vec<usize>,
+    edges: Vec<usize>
 }
 
 impl CSR{
+
+    pub fn from_sorted_edges(edges: &[(usize, usize)], n_nodes: usize) -> CSR{
+        let n_edges = edges.len();
+
+        
+        let mut csr = CSR{
+            edges: vec![0; n_edges],
+            nodes: vec![0; n_nodes + 1]
+        };
+        
+        for (i, (u, v)) in edges.iter().enumerate() {
+            csr.edges[i] = *v;
+            csr.nodes[*u + 1] += 1;
+        }
+        
+        for i in 1..n_nodes {
+            csr.nodes[i+1] += csr.nodes[i];
+        }
+
+        return csr;
+    }
+
     pub fn from_edges(edges: &[(usize, usize)], n_nodes: usize) -> CSR{
         let n_edges = edges.len();
         let mut csr = CSR{
-            edges: vec![0; n_edges*2].into_boxed_slice(),
-            nodes: vec![0; n_nodes + 1].into_boxed_slice(),
+            edges: vec![0; n_edges*2],
+            nodes: vec![0; n_nodes + 1],
         };
 
         for (u, v) in edges {
@@ -49,6 +71,10 @@ impl CSR{
             n_cur: 0,
             e_cur: 0
         }
+    }
+
+    pub fn n_nodes(&self) -> usize{
+        return self.nodes.len() - 1;
     }
 }
 

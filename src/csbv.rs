@@ -71,14 +71,14 @@ impl CSBV{
                 csbv.bit_blocks[bi] = 1usize << (*v % block_size);
                 csbv.block_ids[bi] = bl;
                 bi += 1;
-                csbv.ptrs[*u] += 1; // compute degrees
+                csbv.ptrs[*u + 1] += 1; // compute degrees
             }
             else if bl != bl_prev {
                 bl_prev = bl;
                 csbv.bit_blocks[bi] = 1usize << (*v % block_size);
                 csbv.block_ids[bi] = bl;
                 bi += 1;
-                csbv.ptrs[*u] += 1;
+                csbv.ptrs[*u + 1] += 1;
             }
             else{
                 csbv.bit_blocks[bi-1] |= 1usize << (*v % block_size);
@@ -86,12 +86,12 @@ impl CSBV{
             
         }
 
-        for i in 0..n_nodes {
+        for i in 1..n_nodes {
             csbv.ptrs[i+1] += csbv.ptrs[i];
         }
-        for i in (0..n_nodes).rev() {
-            csbv.ptrs[i+1] = csbv.ptrs[i];
-        }
+        // for i in (0..n_nodes).rev() {
+        //     csbv.ptrs[i+1] = csbv.ptrs[i];
+        // }
         csbv.ptrs[0] = 0;
 
         return csbv;
