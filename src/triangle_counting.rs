@@ -7,7 +7,6 @@ pub fn count_from_csbv(graph: &CSBV) -> usize{
     let mut cnt = 0usize;
 
     for u in 0..graph.n_nodes() {
-        println!("u = {}", u);
         for v in graph.neighbor_iter(u) {
             cnt += count_intersect(u, v, graph);
         }
