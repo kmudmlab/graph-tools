@@ -1,9 +1,62 @@
+use std::fs::File;
+use std::io::{Result, BufWriter, BufReader, Write, Read};
+
 pub struct CSR{
-    nodes: Vec<usize>,
-    edges: Vec<usize>
+    pub nodes: Vec<usize>,
+    pub edges: Vec<usize>
 }
 
 impl CSR{
+
+    pub fn dump(&self, filepath: &str) -> Result<()>{
+        let mut bw = BufWriter::new(File::create(filepath)?);
+
+        // write n_nodes, n_edges
+        bw.write_all(&self.nodes.len().to_ne_bytes())?;
+        bw.write_all(&self.edges.len().to_ne_bytes())?;
+        
+        // write data
+        for n in &self.nodes {
+            bw.write_all(&n.to_ne_bytes())?;
+        }
+        for n in &self.edges {
+            bw.write_all(&n.to_ne_bytes())?;
+        }
+
+        bw.flush()?;
+
+        return Ok(());
+    }
+
+    pub fn load(filepath: &str) -> Result<CSR>{
+        let mut br = BufReader::new(File::open(filepath)?);
+
+        let mut buffer = [0u8; std::mem::size_of::<usize>()];
+
+        // read n_nodes, n_edges
+        br.read_exact(&mut buffer)?;
+        let n_nodes = usize::from_ne_bytes(buffer);
+        br.read_exact(&mut buffer)?;
+        let n_edges = usize::from_ne_bytes(buffer);
+
+        let mut csr = CSR{
+            edges: vec![0usize; n_edges],
+            nodes: vec![0usize; n_nodes]
+        };
+
+        for i in 0..n_nodes {
+            br.read_exact(&mut buffer)?;
+            csr.nodes[i] = usize::from_ne_bytes(buffer);
+        }
+
+        for i in 0..n_edges {
+            br.read_exact(&mut buffer)?;
+            csr.edges[i] = usize::from_ne_bytes(buffer);
+        }
+
+        return Ok(csr);
+    }
+
 
     pub fn from_sorted_edges(edges: &[(usize, usize)], n_nodes: usize) -> CSR{
         let n_edges = edges.len();
