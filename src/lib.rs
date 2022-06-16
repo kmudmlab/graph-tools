@@ -11,6 +11,24 @@ mod test{
     use super::*;
 
     #[test]
+    fn test_csbv_dump_load(){
+        let edges = vec![(1, 37), (1,40), (1,68), (37, 40), (37,68), (37,75), (40, 68), (40, 75)];
+        let n_nodes = 76;
+
+        let original = csbv::CSBV::from_sorted_edges(&edges, n_nodes);
+
+        original.dump("test_csbv_dump_load.bin").unwrap();
+        
+        let dump_loaded = csbv::CSBV::load("test_csbv_dump_load.bin").unwrap();
+
+        assert_eq!(original.bit_blocks, dump_loaded.bit_blocks);
+        assert_eq!(original.block_ids, dump_loaded.block_ids);
+        assert_eq!(original.ptrs, dump_loaded.ptrs);
+
+        std::fs::remove_file("test_csbv_dump_load.bin").unwrap();
+    }
+
+    #[test]
     fn test_tri_csbv(){
         let edges = vec![(1, 37), (1,40), (1,68), (37, 40), (37,68), (37,75), (40, 68), (40, 75)];
         let n_nodes = 76;

@@ -1,3 +1,7 @@
+use std::{fs::File, io::{Read, Write}};
+use std::io::{BufWriter, BufReader};
+use std::io::Result;
+
 // Compressed Sparse Bit Vectors
 pub struct CSBV{
     pub bit_blocks: Vec<usize>,
@@ -11,6 +15,62 @@ impl CSBV{
         return self.ptrs.len() - 1;
     }
 
+    pub fn dump(&self, filepath: &str) -> Result<()>{
+        let mut bw = BufWriter::new(File::create(filepath)?);
+
+        // write n_nodes+1, n_blocks
+        bw.write_all(&self.ptrs.len().to_ne_bytes())?;
+        bw.write_all(&self.block_ids.len().to_ne_bytes())?;
+        
+        // write data
+        for ptr in &self.ptrs {
+            bw.write_all(&ptr.to_ne_bytes())?;
+        }
+        for bid in &self.block_ids {
+            bw.write_all(&bid.to_ne_bytes())?;
+        }
+        for bb in &self.bit_blocks {
+            bw.write_all(&bb.to_ne_bytes())?;
+        }
+
+        bw.flush()?;
+
+        return Ok(());
+    }
+
+    pub fn load(filepath: &str) -> Result<CSBV>{
+
+        let mut br = BufReader::new(File::open(filepath)?);
+        // read n_nodes+1, n_blocks
+        let mut buffer = [0u8; std::mem::size_of::<usize>()];
+        br.read_exact(&mut buffer)?;
+        let n_ptrs = usize::from_ne_bytes(buffer);
+        br.read_exact(&mut buffer)?;
+        let n_blocks = usize::from_ne_bytes(buffer);
+
+        let mut csbv = CSBV{
+            bit_blocks: vec![0usize; n_blocks],
+            block_ids: vec![0usize; n_blocks],
+            ptrs: vec![0usize; n_ptrs]
+        };
+
+        for i in 0..n_ptrs {
+            br.read_exact(&mut buffer)?;
+            csbv.ptrs[i] = usize::from_ne_bytes(buffer);
+        }
+
+        for i in 0..n_blocks {
+            br.read_exact(&mut buffer)?;
+            csbv.block_ids[i] = usize::from_ne_bytes(buffer);
+        }
+
+        for i in 0..n_blocks {
+            br.read_exact(&mut buffer)?;
+            csbv.bit_blocks[i] = usize::from_ne_bytes(buffer);
+        }
+
+        return Ok(csbv);
+    }
 
     pub fn block_iter(&self, u: usize) -> NeighborBlockIterator{
         return NeighborBlockIterator{
