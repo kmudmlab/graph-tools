@@ -1,4 +1,6 @@
+
 use std::cmp::Ordering;
+
 
 pub mod csr {
 
@@ -60,8 +62,37 @@ pub mod csr {
 }
 
 pub mod csbv {
+
+    use crossbeam;
     
     use crate::csbv::CSBV;
+
+    pub fn count_parallel(graph: &CSBV, n_thread: usize) -> usize{
+        
+        let mut cnt = 0usize;
+
+        crossbeam::scope(|scope| {
+            let mut threads = vec![];
+            for i in 0..n_thread{
+                threads.push(scope.spawn(move |_| -> usize {
+                    let mut cnt = 0usize;
+                    for u in (i..graph.n_nodes()).step_by(n_thread) {
+                        for v in graph.neighbor_iter(u) {
+                            cnt += count_intersect(u, v, &graph);
+                        }
+                    }
+                    return cnt;
+                }));
+            }
+
+            for t in threads {
+                cnt += t.join().unwrap();
+            }
+        }).unwrap();
+
+        return cnt;
+
+    }
 
     pub fn count(graph: &CSBV) -> usize{
 
