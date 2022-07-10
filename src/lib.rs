@@ -4,7 +4,8 @@ pub mod csr;
 pub mod heap;
 pub mod slashburn;
 pub mod csbv;
-
+pub mod coo;
+pub mod vis;
 
 #[cfg(test)]
 mod test{
